@@ -1,0 +1,47 @@
+import os
+import shutil
+import random
+
+# Define the path to your dataset
+dataset_path = r"C:\Users\79894\Downloads\archive1"
+
+# Define the path where you want to save the training and validation data
+train_dir = r"C:\Users\79894\Downloads\splidata2\train"
+validation_dir = r"C:\Users\79894\Downloads\splidata2\validation"
+
+# Create directories if they don't exist
+os.makedirs(train_dir, exist_ok=True)
+os.makedirs(validation_dir, exist_ok=True)
+
+# Define the percentage of data to use for validation
+validation_split = 0.2  # 20% for validation
+
+# Iterate over each breed folder in the dataset
+for breed_folder in os.listdir(dataset_path):
+    breed_path = os.path.join(dataset_path, breed_folder)
+    if os.path.isdir(breed_path):
+        # Create corresponding folders in the train and validation directories
+        os.makedirs(os.path.join(train_dir, breed_folder), exist_ok=True)
+        os.makedirs(os.path.join(validation_dir, breed_folder), exist_ok=True)
+        
+        # List images in the breed folder
+        images = os.listdir(breed_path)
+        # Shuffle the images randomly
+        random.shuffle(images)
+        
+        # Calculate the number of images to move to validation set
+        num_validation = int(len(images) * validation_split)
+        
+        # Move images to validation directory
+        for img_name in images[:num_validation]:
+            src = os.path.join(breed_path, img_name)
+            dest = os.path.join(validation_dir, breed_folder, img_name)
+            shutil.copy(src, dest)
+        
+        # Move remaining images to training directory
+        for img_name in images[num_validation:]:
+            src = os.path.join(breed_path, img_name)
+            dest = os.path.join(train_dir, breed_folder, img_name)
+            shutil.copy(src, dest)
+
+print("Data separation completed.")
